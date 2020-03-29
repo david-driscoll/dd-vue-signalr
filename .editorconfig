@@ -1,0 +1,6 @@
+﻿[*.ts]
+tab_width = 2
+
+[*.vue]
+tab_width = 2
+

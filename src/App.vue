@@ -39,9 +39,9 @@
 
             <v-row>
                 <v-flex xs12 sm4>
-                    <v-row v-for="item in people" :key="item.id">
+                    <v-row v-for="[key, item] in people" :key="item.id">
                         <v-col>
-                            {{item.firstName}} {{item.lastName}} ({{item.seed}})
+                            {{item.firstName}} {{item.lastName}} ({{item.seed}}) [{{people.get(item.parentId) && people.get(item.parentId).name}}]
                         </v-col>
                     </v-row>
                 </v-flex>
@@ -133,9 +133,10 @@
 
             const tree = ref<any>();
             const treeData = ref([] as PersonWithChildren[]);
-            const people = ref([] as Person[]);
+            const people = ref(new Map<string, Person>());
 
-            const people$ = asObservableCache(streamItem<IChangeSet<Person, string>>(conn, "people"), true).connect();
+            const cache = asObservableCache(streamItem<IChangeSet<Person, string>>(conn, "people"), true)
+            const people$ = cache.connect();
 
             function transformChildren(person: Node<Person, string>): PersonWithChildren & IDisposableOrSubscription {
                 // const children = reactive(toArray(ixFrom(person.children.values()).pipe(ixMap(z => z.item))));
@@ -168,7 +169,7 @@
                     people$
                             .pipe(
                                     limitSizeTo(10),
-                                    bind(people.value, bind.create(people.value, (v, k) => people.value.findIndex(x => x.id === k))),
+                                    clone(people.value),
                             ).subscribe(),
             );
 

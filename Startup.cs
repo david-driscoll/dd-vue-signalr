@@ -233,7 +233,7 @@ namespace dd_vue_signalr
                     .RuleFor(z => z.Id, f => f.Random.Guid())
                     .RuleFor(z => z.FirstName, f => f.Name.FirstName())
                     .RuleFor(z => z.LastName, f => f.Name.LastName())
-                    .RuleFor(x => x.ParentId, f => f.PickRandom(_cache.Items.TakeLast(5)).Id)
+                    .RuleFor(x => x.ParentId, f => f.PickRandom(_cache.Items.OrderByDescending(z => z.Seed).Take(5)).Id)
                 ;
 
             const int parents = 6;
